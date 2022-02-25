@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.sql.Array;
 import java.sql.PreparedStatement;
@@ -19,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class OrderRepositoryImpl implements OrderRepository {
-    private ProductService productService;
-    private JdbcTemplate jdbcTemplate;
+    private final ProductService productService;
+    private final JdbcTemplate jdbcTemplate;
     private final String SELECT_ALL_QUERY = "SELECT * FROM SHOP_ORDER";
     private final String SELECT_BY_ID_QUERY = "SELECT * FROM SHOP_ORDER WHERE id = ?";
     private final String SELECT_BY_USER_ID_QUERY = "SELECT * FROM SHOP_ORDER WHERE user_id = ?";
@@ -32,22 +33,24 @@ public class OrderRepositoryImpl implements OrderRepository {
     private final String UPDATE_QUERY = "UPDATE SHOP_ORDER SET user_id=?,address=?,status=? WHERE id=?";
     private final String DELETE_QUERY = "DELETE FROM SHOP_ORDER WHERE id=?";
     private final String DELETE_ORDER_PRODUCTS_QUERY = "DELETE FROM SHOP_ORDER_PRODUCTS WHERE order_id=?";
-    private final String COUNT_QUERY = "SELECT COUNT(*) as count FROM SHOP_ORDER;";
 
-    @Autowired
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+    public OrderRepositoryImpl(ProductService productService, JdbcTemplate jdbcTemplate) {
+        this.productService = productService;
         this.jdbcTemplate = jdbcTemplate;
     }
-
-    @Autowired
-    public void setProductRepository(ProductService productService) {
-        this.productService = productService;
-    }
+//    @Autowired
+//    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+//        this.jdbcTemplate = jdbcTemplate;
+//    }
+//
+//    @Autowired
+//    public void setProductRepository(ProductService productService) {
+//        this.productService = productService;
+//    }
 
     @Override
     public List<Order> findAll() {
-        return jdbcTemplate.query(SELECT_ALL_QUERY, new OrderRowMapper()).stream().peek(
-                (order) -> order.setProducts(productService.getOrderProducts(order.getId()))
+        return jdbcTemplate.query(SELECT_ALL_QUERY, new OrderRowMapper()).stream().peek((order) -> order.setProducts(productService.getOrderProducts(order.getId()))
         ).collect(Collectors.toList());
     }
 

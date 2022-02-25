@@ -6,15 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlRowSetResultSetExtractor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Service
 public class ProductRepositoryImpl implements kz.iitu.itse1909.amirlan.repository.ProductRepository {
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
     private final String SELECT_ALL_QUERY = "SELECT * FROM SHOP_PRODUCT";
     private final String SELECT_BY_ID_QUERY = "SELECT * FROM SHOP_PRODUCT WHERE id = ?";
     private final String SELECT_ORDER_PRODUCTS_QUERY = "SELECT * FROM SHOP_ORDER_PRODUCTS op " +
@@ -24,8 +25,7 @@ public class ProductRepositoryImpl implements kz.iitu.itse1909.amirlan.repositor
     private final String DELETE_QUERY = "DELETE FROM SHOP_PRODUCT WHERE id=?";
     private final String COUNT_QUERY = "SELECT COUNT(*) as count FROM SHOP_PRODUCT;";
 
-    @Autowired
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+    public ProductRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

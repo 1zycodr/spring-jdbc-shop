@@ -1,6 +1,8 @@
 package kz.iitu.itse1909.amirlan.repository;
 
 import kz.iitu.itse1909.amirlan.model.Order;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

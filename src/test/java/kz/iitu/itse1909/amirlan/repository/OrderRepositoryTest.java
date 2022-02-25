@@ -5,6 +5,7 @@ import kz.iitu.itse1909.amirlan.repository.impl.OrderRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.when;
 class OrderRepositoryTest {
 
     @Mock
-    OrderRepositoryImpl orderRepository;
+    OrderRepository orderRepository;
 
     @Mock
     ProductRepository productRepository;
@@ -28,6 +29,7 @@ class OrderRepositoryTest {
 
     @Test
     void findAll() {
+        Mockito.when(orderRepository.findAll()).thenReturn(new ArrayList<>());
         List<Order> orderList = orderRepository.findAll();
         System.out.println(orderList);
         assertInstanceOf(List.class, orderList);
