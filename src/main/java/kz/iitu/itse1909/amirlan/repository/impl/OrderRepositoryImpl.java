@@ -16,6 +16,7 @@ import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,7 +58,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order findById(Long id) {
         Order order = jdbcTemplate.queryForObject(SELECT_BY_ID_QUERY, new Object[]{id}, new OrderRowMapper());
-        System.out.println(productService.getOrderProducts(id));
+        System.out.println(order);
+        if (order == null) {
+            return null;
+        }
         order.setProducts(productService.getOrderProducts(id));
         return order;
     }
@@ -77,28 +81,33 @@ public class OrderRepositoryImpl implements OrderRepository {
                 order.getAddress(),
                 order.getStatus()
         );
+        Integer id = jdbcTemplate.queryForObject("SELECT MAX(id) FROM SHOP_ORDER", Integer.class);
+        if (id == null) id = 1;
         order.setId(
                 Long.parseLong(String.valueOf(
-                        jdbcTemplate.queryForObject("SELECT MAX(id) FROM SHOP_ORDER", Integer.class))
-                )
+                        id
+                ))
         );
-        List<Map.Entry<Product, Integer>> ordersList =
-                new ArrayList<>(order.getProducts().entrySet());
-        jdbcTemplate.batchUpdate(
-                INSERT_ORDER_PRODUCTS, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        Map.Entry<Product, Integer> orderProduct = ordersList.get(i);
-                        ps.setInt(1, Integer.parseInt(String.valueOf(order.getId())));
-                        ps.setInt(2, Integer.parseInt(String.valueOf(orderProduct.getKey().getId())));
-                        ps.setInt(3, orderProduct.getValue());
+        if (order.getProducts() != null) {
+
+            List<Map.Entry<Product, Integer>> ordersList =
+                    new ArrayList<>(order.getProducts().entrySet());
+            jdbcTemplate.batchUpdate(
+                    INSERT_ORDER_PRODUCTS, new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            Map.Entry<Product, Integer> orderProduct = ordersList.get(i);
+                            ps.setInt(1, Integer.parseInt(String.valueOf(order.getId())));
+                            ps.setInt(2, Integer.parseInt(String.valueOf(orderProduct.getKey().getId())));
+                            ps.setInt(3, orderProduct.getValue());
+                        }
+                        @Override
+                        public int getBatchSize() {
+                            return ordersList.size();
+                        }
                     }
-                    @Override
-                    public int getBatchSize() {
-                        return ordersList.size();
-                    }
-                }
-        );
+            );
+        }
     }
 
     @Override
@@ -116,8 +125,10 @@ public class OrderRepositoryImpl implements OrderRepository {
                     DELETE_ORDER_PRODUCTS_QUERY,
                     order.getId()
             );
+            Map<Product, Integer> orderProducts = order.getProducts();
+            if (orderProducts == null) orderProducts = new HashMap<>();
             List<Map.Entry<Product, Integer>> ordersList =
-                    new ArrayList<>(order.getProducts().entrySet());
+                    new ArrayList<>(orderProducts.entrySet());
             jdbcTemplate.batchUpdate(
                     INSERT_ORDER_PRODUCTS, new BatchPreparedStatementSetter() {
                         @Override
