@@ -1,4 +1,4 @@
-package kz.iitu.itse1909.amirlan.repository.mappers;
+package kz.iitu.itse1909.amirlan.service.mappers;
 
 import kz.iitu.itse1909.amirlan.model.Product;
 import org.springframework.jdbc.core.RowMapper;

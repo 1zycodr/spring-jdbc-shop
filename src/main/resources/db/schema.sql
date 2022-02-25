@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS SHOP_ORDER (
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
             REFERENCES SHOP_USER(id)
+                ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS SHOP_PRODUCT (
@@ -30,8 +31,10 @@ CREATE TABLE IF NOT EXISTS SHOP_ORDER_PRODUCTS (
     quantity    INT DEFAULT 1,
     CONSTRAINT fk_product_order
         FOREIGN KEY(order_id)
-            REFERENCES SHOP_ORDER(id),
+            REFERENCES SHOP_ORDER(id)
+                ON DELETE CASCADE,
     CONSTRAINT fk_order_product
         FOREIGN KEY(product_id)
             REFERENCES SHOP_PRODUCT(id)
+                ON DELETE CASCADE
 );

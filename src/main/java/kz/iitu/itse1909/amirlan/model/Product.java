@@ -2,7 +2,6 @@ package kz.iitu.itse1909.amirlan.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -13,4 +12,10 @@ public class Product implements Serializable {
     private String title;
     private String description;
     private Integer price;
+
+    public Product(String title, String description, Integer price) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+    }
 }
